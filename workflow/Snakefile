@@ -1,0 +1,84 @@
+import pandas as pd 
+
+Samples=(pd.read_csv("samples",sep="\t",header=None).iloc[:,0].tolist())
+
+rule all:
+    input:
+        expand("start_anno/{sample}.startAnno.bed",sample=Samples),
+        expand("element_anno/{sample}.startAnno.bed",sample = Samples),
+        expand("mappingState/{sample}.mapping.stats.tsv",sample=Samples),
+        expand("mappingState/{sample}_total_mappings.txt",sample=Samples),
+        expand("GCs/{sample}.gcContents.txt",sample=Samples)
+
+rule filter:
+    input:
+        "FinallyData/{sample}_circle_site.bed"
+    output:
+        protected("filterData/{sample}_circle_site.filter.tsv")
+    shell:
+        "python3 workflow/scripts/filter.py {input} {wildcards.sample} filterData 2 200"
+
+rule bedformat:
+    input:
+        "filterData/{sample}_circle_site.filter.tsv"
+    output:
+        protected("filter_bed/{sample}.ecc.bed")
+    shell:
+        "Rscript workflow/scripts/bedformat.R {input} {wildcards.sample} filter_bed"
+
+rule mappingState:
+    input:
+        "preData/sorted_{sample}_circle.bam"
+    output:
+        "mappingState/{sample}.mapping.stats.tsv"
+    shell:
+        "python3 workflow/scripts/get_index_statistic.py {input} {wildcards.sample} mappingState"
+
+rule getTotalMappings:
+    input:
+        "preData/sorted_{sample}_circle.bam"
+    output:
+        "mappingState/{sample}_total_mappings.txt"
+    shell:
+        "python3 workflow/scripts/calMappings_nochrM.py {input} {wildcards.sample} mappingState"
+
+rule anno:
+    input:
+        "filter_bed/{sample}.ecc.bed",
+        "dbs/hg38.coding.bed"
+    output:
+        "start_anno/{sample}.startAnno.bed"
+    shell:
+        "julia workflow/scripts/start_anno.jl {input} {wildcards.sample} start_anno"
+
+rule element_anno:
+    input:
+        "filter_bed/{sample}.ecc.bed",
+        "dbs/hg38.genetic_elements.merge.bed"
+    output:
+        "element_anno/{sample}.startAnno.bed"
+    shell:
+        "julia workflow/scripts/start_anno.jl {input} {wildcards.sample} element_anno"
+
+rule GC:
+    input:
+        "dbs/hg38.chromo.size",
+        "dbs/hg38.fa",
+        "filter_bed/{sample}.ecc.bed"
+    output:
+        temp("GCs/{sample}.upstream.gc.txt"),
+        temp("GCs/{sample}.ecc.gc.txt"),
+        temp("GCs/{sample}.downstream.gc.txt")   
+    shell:
+        "bash workflow/scripts/calGC.sh {input[2]} {wildcards.sample} GCs {input[0]} {input[1]}"
+
+rule GCprocess:
+    input:
+        "GCs/{sample}.upstream.gc.txt",
+        "GCs/{sample}.ecc.gc.txt",
+        "GCs/{sample}.downstream.gc.txt"
+    output:
+        "GCs/{sample}.gcContents.txt"
+    shell:
+        "python3 workflow/scripts/calGC.py {input} {wildcards.sample} GCs"
+

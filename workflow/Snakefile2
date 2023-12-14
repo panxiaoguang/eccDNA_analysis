@@ -1,0 +1,56 @@
+import pandas as pd 
+
+Samples=(pd.read_csv("samples",sep="\t",header=None).iloc[:,0].tolist())
+
+rule all:
+    input:
+        expand("report/{sample}_summary.html",sample=Samples)
+
+rule total_mappings:
+    input:
+        "preData/sorted_{sample}_circle.bam"
+    output:
+        "mappingState/{sample}.mapping.total.tsv"
+    script:
+        "scripts2/get_mapping.py"
+
+rule cal_ecc_num:
+    input:
+        "FinallyData/{sample}_circle_site.bed"
+    output:
+        "BaseState/{sample}.eccNum.txt"
+    script:
+        "scripts2/cal_ecc_num.py"
+
+rule calGC:
+    input:
+        ref="dbs/hg38.fa",
+        ecc="FinallyData/{sample}_circle_site.bed"
+    output:
+        "BaseState/{sample}.gcContents.txt"
+    script:
+        "scripts2/calGC.py"
+
+rule calLength:
+    input:
+        "FinallyData/{sample}_circle_site.bed"
+    output:
+        "BaseState/{sample}.length.txt"
+    script:
+        "scripts2/calLength.py"
+
+rule makeReport:
+    input:
+        mpTotal = "mappingState/{sample}.mapping.total.tsv",
+        eccN = "BaseState/{sample}.eccNum.txt",
+        gc = "BaseState/{sample}.gcContents.txt",
+        lgth = "BaseState/{sample}.length.txt",
+        ecc = "FinallyData/{sample}_circle_site.bed",
+        fp = "Fastp/{sample}.clean.json"
+    output:
+        "report/{sample}_summary.html"
+    script:
+        "scripts2/makeReport.py"
+    
+
+

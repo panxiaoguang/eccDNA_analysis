@@ -1,0 +1,1 @@
+echo "minimap2 -x map-hifi -c --secondary=no -t 10 /home/panxiaoguang/Project/DataBase/hg38.fa CCS/${1}.ccs.fastq.gz > alignData/${1}.align.paf"

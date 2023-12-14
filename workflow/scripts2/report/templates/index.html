@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>eccDNA summary</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container">
+            <a class="navbar-brand" href="#">eccDNA Report</a>
+        </div>
+    </nav>
+    <div class="container">
+        <ul class="nav nav-tabs my-3" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" role="tab" id="summary-tab" data-bs-toggle="tab" href="#Summary"
+                    aria-controls="Summary" aria-selected="true">Summary</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" role="tab" id="express-tab" data-bs-toggle="tab" href="#GeneExpression"
+                    aria-controls="GeneExpression" aria-selected="false">ReadMe</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="Summary" role="tabpanel" aria-labelledby="summary-tab">
+                <div class="row my-3 text-center ">
+                    <div class="col-6">
+                        <div class="card my-3">
+                            <div class="card-body">
+                                <h2 class="text-success">{{rawEccNumber}}</h2>
+                                <p>Estimated Number of eccDNAs</p>
+                            </div>
+                        </div>
+                        <div class="card my-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h2 class="text-success">{{length}}</h2>
+                                        <p>Median length of eccDNAs</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <h2 class="text-success">{{GCs}}%</h2>
+                                        <p>Median GCs of eccDNAs</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card my-3">
+                            <div class="card-body">
+                                <h3 class="card-title text-start px-3">
+                                    Sequencing
+                                </h3>
+                                <ul class="list-group  list-group-flush py-0">
+                                    {% for seqinfo in SeqInfos %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <p>{{seqinfo.item}}</p>
+                                            <p>{{seqinfo.value}}</p>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card my-3">
+                            <div class="card-body">
+                                <h3 class="card-title text-start px-3">
+                                    Mapping
+                                </h3>
+                                <ul class="list-group  list-group-flush py-0">
+                                    {% for map in Mappings %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <p>{{map.item}}</p>
+                                            <p>{{map.value}}</p>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card my-3">
+                            <div class="card-body">
+                                <h3 class="card-title text-start px-3">
+                                    eccDNA
+                                </h3>
+                                <div class="w-100 h-25">
+                                    {{graph|safe}}
+                                </div>
+                                <div class="w-100 h-25">
+                                    {{graphGC|safe}}
+                                </div>
+                                <ul class="list-group  list-group-flush py-0">
+                                    {% for ecc in eccDNAs %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <p>{{ecc.item}}</p>
+                                            <p>{{ecc.value}}</p>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card my-3">
+                            <div class="card-body">
+                                <h3 class="card-title text-start px-3">
+                                    Sample
+                                </h3>
+                                <ul class="list-group  list-group-flush py-0">
+                                    {% for sample in Samples %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <p>{{sample.item}}</p>
+                                            <p>{{sample.value}}</p>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="GeneExpression" role="tabpanel" aria-labelledby="express-tab">
+              <div class="text-start p-3">
+                <h2>Introduction:</h2>
+                <p>Extrachromosomal circular DNA (eccDNA) is a specific type of DNA molecule that has been observed in
+                    different species
+                    for decades. It is characterized as small and highly dispersed circular DNA molecules, including
+                    spcDNA, t-circles,
+                    microDNA, and ecDNA, based on their size and sequence. Recent evidence suggests that eccDNA plays an
+                    important role in
+                    rapid adaptation and contributes to genomic instability, which leads to genetic diversity and
+                    evolution. Moreover,
+                    eccDNA has diverse and significant biological functions, which are implicated in the development of
+                    various diseases
+                    including cancer. Therefore, characterizing the full landscape of eccDNA has become critical for
+                    understanding its roles
+                    in genome regulation, evolution, and disease pathogenesis.</p>
+                <p>NGS (Next-generation sequencing) technology has provided us with powerful tools to explore the
+                    genomic landscape of
+                    various organisms. To identify eccDNA from NGS data, a general strategy is to map NGS reads to the
+                    reference genome or
+                    de novo assemble the NGS reads into contigs, followed by mapping them back to the genome. EccDNAs,
+                    being independent of
+                    conventional chromosomes, do not always align to the reference genome with high confidence or may
+                    not be detectable
+                    through standard analysis pipelines. Therefore, specialized algorithms or programs, such as Eccles,
+                    CIRCexplorer2, and
+                    eccCall, have been developed to aid in identifying eccDNA from NGS data. These programs utilize
+                    multiple criteria,
+                    including the circularity of the sequence, the abundance of the sequence, and the presence of
+                    breakpoints, to improve
+                    the sensitivity and specificity of eccDNA detection. Ultimately, the identification of eccDNA from
+                    NGS data using these
+                    methods allows for a more comprehensive understanding of genome architecture and the role of eccDNA
+                    in genetic diversity
+                    and disease.
+                </p>
+                <p>Circle-Map takes as input an alignment of reads to a reference genome (e.g. a BWA-MEM generated BAM
+                    file) and like other
+                    methods, it will use those alignments to detect cases were the read has been split into two segments
+                    (e.g. split reads)
+                    to detect genomic rearrangements supporting a circular DNA structure.</p>
+                <p>However, this approach results in many split read alignments being missed because the aligner is not
+                    able to map both
+                    split segments of the read, either because they are too short or because they align to too many
+                    places. In this cases,
+                    the aligner will report a read alignment containing some of the bases unmapped (e.g soft-clipped
+                    reads).</p>
+                <p>Unlike other methods, Circle-Map is able to map both segments of the soft-clipped reads by realigning
+                    the unmapped parts
+                    probabilistically to a graph representation of the circular DNA breakpoints. Which allows for a more
+                    accurate detection
+                    of the circular DNA breakpoints. In our recent paper
+                    (https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-3160-3) we show how this
+                    approach dramatically
+                    increases sensitivity while retaining high precision.</p>
+            </div>
+           </div>
+        </div>
+
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/plotly.js/2.20.0/plotly.min.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,1 @@
+echo "python3 /home/panxiaoguang/app/eccDNA_RCA_nanopore/eccDNA_RCA_nanopore.py --fastq fastq/${1}.ccs.fastq --paf alignData/${1}.align.paf --reference /home/panxiaoguang/Project/DataBase/hg38.fa --info eccDNAs/${1}.info.txt --seq eccDNAs/${1}.seq.txt --var eccDNAs/${1}.var.txt"
